@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.jwt.JWTUtil;
 import com.example.demo.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,14 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    private final JWTUtil jwtUtil;
+
+    public SecurityConfig(
+            AuthenticationConfiguration authenticationConfiguration,
+            JWTUtil jwtUtil
+    ) {
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
     }
 
     // custom 필터위치를 정하기위해 메서드 생성
@@ -50,7 +57,7 @@ public class SecurityConfig {
                 // .addFilterAfter  => 원하는 필터 뒤에 필터 등록
                 // .addFilterBefore => 원하는 필터 앞에 필터 등록
                 // UsernamePasswordAuthenticationFilter 를 커스텀 필터로 대체할것이기 때문에 addFilterAt을 사용한다.
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
